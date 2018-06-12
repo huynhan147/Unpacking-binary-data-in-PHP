@@ -1,14 +1,14 @@
-# Unpacking binary data in PHP
+# Giải nén dữ liệu nhị phân trong PHP
 
-Working with binary files in PHP is rarely a requirement. However when needed the PHP 'pack' and 'unpack' functions can help you tremendously. To set the stage we will start with a programming problem, this will keep the discussion anchored to a relevant context. The problem is this : We want to write a function that takes a image file as an argument and tells us whether the file is a GIF image; irrelevant with whatever the extension the file may have. We are not to use any GD library functions.  
+Rất ít khi chúng ta phải làm việc với các file nhị nhân trong PHP. Tuy nhiên khi cần thì hàm 'pack' và 'unpack' thì PHP có thể giúp bạn rất nhiều. Để thiết lập giai đoạn chúng ta sẽ bắt đầu với một vấn đề lập trình, điều này sẽ giúp cho cuộc thảo luận được gắn với hoàn cảnh liên quan. Vấn đề ở đây là : Chúng ta muốn viết một hàm có đối số là một file ảnh và cho biết có phải là ảnh GIF hay không,bất kể file có đuôi như thế nào. Chúng ta không sử dụng bất kỳ hàm thư viện GD nào.
 
 #### A GIF file header
 
-With the requirement that we are not allowed to use any graphics functions, to solve the problem we need to get the relevant data from the GIF file itself. Unlike a HTML or XML or other text format files, a GIF file and most other image formats are stored in a binary format. Most binary files carry a header at the top of the file which provides the meta information regarding the particular file. We can use this information to find out the type of the file and other things, such as height an width in case of a GIF file. A typical raw GIF header is shown below, using a hex editor such as [WinHex][1]. 
+Với yêu cầu là không sử dụng bất kỳ hàm đồ họa nào, để giải quyết vấn đề này chúng ta cần lấy dữ liệu liên quan từ chính file GIF. Không giống như file HTML hoặc XML hoặc các file định dạng văn bản khác, một file GIF và hầu hết các định dạng hình ảnh khác được lưu trữ ở định dạng nhị phân. Hầu hết các file nhị phân đều có header ở đầu file cung cấp thông tin meta về file cụ thể. Chúng ta có thể sử dụng thông tin này để tìm ra loại file và những thứ khác, chẳng hạn như chiều cao chiều rộng trong trường hợp là một file GIF. Một header GIF thông thường được hiển thị như bên dưới, sử dụng trình soạn thảo hex như [WinHex](1). 
 
 ![](http://www.codediesel.com/wp-content/uploads/2010/09/winhex.gif)
 
-The detailed description of the header is given below.
+Mô tả chi tiết header ở bên dưới
 
 
     
@@ -30,11 +30,12 @@ The detailed description of the header is given below.
 
 
 
-So to check if the image file is a valid GIF, we need to check the starting 3 bytes of the header, which have the 'GIF' marker, and the next 3 bytes, which give the version number; either '87a' or '89a'. It is for tasks such as these that the unpack() function is indispensable. Before we look at the solution, we will take a quick look at the unpack() function itself.
+Vì vậy để kiểm tra một file ảnh có đúng là một file GIF không, Chúng ta cần phải kiểm tra 3 byte đầu của phần header, cóa 'GIF', và 3 byte tiếp theo, là sôs phiên bản '87a' hoặc '89a'. Nó là những thứ mà hàm unpack() cần phải thực hiện. Trước khi chúng ta tìm giải pháp, nhìn qua xem hàm unpack() hoạt động thế nào.
 
-#### Using the unpack() function
+#### Sử dụng hàm unpack()
 
-[unpack()][3] is the complement of [pack()][4] – it transforms binary data into an associative array based on the format specified. It is somewhat along the lines of _sprintf_, transforming string data according to some given format. These two functions allow us to read and write buffers of binary data according to a specified format string. This easily enables a programmer to exchange data with programs written in other languages or other formats. Take a small example.
+[unpack()](3) là sự bổ sung của [pack()](4) – nó chuyển đổi dữ liệu nhị phân thành một mảng liên kết dựa trên định dạng được chỉ định. Nó có phần giống với _sprintf_, Chuyển đổi chuôĩ dữ liệu theo một số định dạng nhất định. Hai hàm này cho phép chúng ta đọc và ghi các bộ đệm của dữ liệu nhị phân theo một chuỗi định dạng được chỉ định. Điều này cho phép một lập trình viên dễ dàng chuyển đổi dữ liệu với các chương trình được viết bằng các ngôn ngữ khác hoặc các định dạng khác. Lấy một ví dụ nhỏ.
+
 
 
     
@@ -43,7 +44,7 @@ So to check if the image file is a valid GIF, we need to check the starting 3 by
     var_dump($data);
 
 
-This will print the following, decimal codes for 'codediesel' :
+Thao tác này sẽ in các mã thập phân của 'codediesel' :
 
     
     
@@ -60,13 +61,12 @@ This will print the following, decimal codes for 'codediesel' :
       10 => int 108
 
 
-In the above example the first argument is the format string and the second the actual data. The format string specifies how the data argument should be parsed. In this example the first part of the format 'C', specifies that we should treat the first character of the data as a unsigned byte. The next part '*', tells the function to apply the previously specified format code to all the remaining characters.
+Trong ví dụ trên, đối số đầu tiên là chuỗi định dạng và thứ hai là dữ liệu thực tế.Chuỗi định dạng xác định cách parse đối số dữ liệu. Trong ví dụ này, phần đầu tiên của định dạng 'C', cho biết chúng ta nên xử lý ký tự đầu tiên của dữ liệu dưới dạng một unsigned byte. Phần tiếp theo ' * ', yêu cầu hàm áp dụng code định dạng được chỉ định trước đó cho tất cả các ký tự còn lại.
 
-Although this may look confusing, the next section provides a concrete example.
+Mặc dù điều này có vẻ khó hiểu, phần tiếp theo cung cấp một ví dụ cụ thể.
+#### Lấy dữ liệu header
 
-#### Grabbing the header data
-
-Below is the solution to our GIF problem using the unpack() function. The _is_gif()_ function will return true if the given file is in a GIF format.
+Dưới đây là giải pháp cho vấn đề GIF của chúng ta bằng cách sử dụng hàm unpack (). Hàm _is_gif()_ sẽ trả về true nếu file đã cho ở định dạng GIF.
 
     
     
@@ -96,9 +96,9 @@ Below is the solution to our GIF problem using the unpack() function. The _is_gi
 
 
 
-The important line to note is the format specifier. The 'A6' characters specifies that the unpack() function is to get the the first 6 bytes of the data and interpret it as a string. The retrieved data is then stored in an associate array with the key named 'version'.
+Dòng quan trọng cần lưu ý là dòng format specifier. Ký tự 'A6' cho biết rằng hàm unpack() sẽ lấy 6 byte đầu tiên của dự liệu và xuất nó ra dưới dạng chuỗi. Dữ liệu đã truy xuất sau đó được lưu trữ trong một mảng liên kết với khóa có tên là 'version'.
 
-Another example is given below. This returns some additional header data of the GIF file, including the image width and height.
+Một ví dụ khác được đưa ra dưới đây. Nó trả về một số dữ liệu bổ sung trong header của file GIF bao gồm chiều rộng và chiều cao của ảnh.
 
     
     
@@ -134,10 +134,9 @@ Another example is given below. This returns some additional header data of the 
      
     /* Run our example */
     print_r(get_gif_header("aboutus.gif"));
+ 
 
- | 
-
-The above example will print the following when run.
+Ví dụ trên khi chạy sẽ in ra như sau
 
     
     
@@ -154,7 +153,7 @@ The above example will print the following when run.
 
  
 
-Below we will go into the details of how the format specifier works. I'll split the format, giving the details for each character.
+Dưới đây chúng ta sẽ đi vào chi tiết cách mà format specifier hoạt động. Tôi sẽ chi nhỏ các định dạng, đưa ra các chi tiết cho mỗi định dạng.
 
 
     
@@ -195,6 +194,6 @@ Below we will go into the details of how the format specifier works. I'll split 
 
  
 
-More format options can be found [here][4]. Although I've only shown a small example, the pack/unpack is capable of much complex work than presented here.
+Bạn có thể tìm thấy các tùy chọn định dạng khác [tại đây](4). Mặc dù tôi chỉ trình bày một ví dụ nhỏ, pack/unpacka có thể làm được nhiều thứ hơn so với những cái tôi trình bày ở đây.
 
-Note: Since PHP version 7.2.0 float and double types supports both Big Endian and Little Endian.
+Note: Từ phiên bản PHP 7.2.0 kiểu float và double được hỗ trợ bởi cả Big Endian và Little Endian.
