@@ -1,3 +1,4 @@
+# [Link ImageChecker](https://packagist.org/packages/huyphi/image_checker)  
 # Giải nén dữ liệu nhị phân trong PHP
 
 Rất ít khi chúng ta phải làm việc với các file nhị nhân trong PHP. Tuy nhiên khi cần thì hàm 'pack' và 'unpack' thì PHP có thể giúp bạn rất nhiều. Để thiết lập giai đoạn chúng ta sẽ bắt đầu với một vấn đề lập trình, điều này sẽ giúp cho cuộc thảo luận được gắn với hoàn cảnh liên quan. Vấn đề ở đây là : Chúng ta muốn viết một hàm có đối số là một file ảnh và cho biết có phải là ảnh GIF hay không,bất kể file có đuôi như thế nào. Chúng ta không sử dụng bất kỳ hàm thư viện GD nào.
