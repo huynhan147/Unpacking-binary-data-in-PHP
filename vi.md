@@ -1,9 +1,9 @@
 # [Link ImageChecker](https://packagist.org/packages/huyphi/image_checker)  
 # Giải nén dữ liệu nhị phân trong PHP
 
-Rất ít khi chúng ta phải làm việc với các file nhị nhân trong PHP. Tuy nhiên khi cần thì hàm 'pack' và 'unpack' thì PHP có thể giúp bạn rất nhiều. Để thiết lập giai đoạn chúng ta sẽ bắt đầu với một vấn đề lập trình, điều này sẽ giúp cho cuộc thảo luận được gắn với hoàn cảnh liên quan. Vấn đề ở đây là : Chúng ta muốn viết một hàm có đối số là một file ảnh và cho biết có phải là ảnh GIF hay không,bất kể file có đuôi như thế nào. Chúng ta không sử dụng bất kỳ hàm thư viện GD nào.
+Rất ít khi chúng ta phải làm việc với các file nhị nhân trong PHP. Tuy nhiên khi cần thì hàm 'pack' và 'unpack' của PHP có thể giúp bạn rất nhiều. Để chuẩn bị chúng ta sẽ bắt đầu với một vấn đề lập trình, điều này sẽ giúp cho cuộc thảo luận được gắn với hoàn cảnh liên quan. Vấn đề ở đây là : Chúng ta muốn viết một hàm có đối số là một file ảnh và cho biết có phải là ảnh GIF hay không,bất kể file có đuôi như thế nào. Chúng ta không sử dụng bất kỳ hàm thư viện GD nào.
 
-#### A GIF file header
+#### Header của một tệp GIF
 
 Với yêu cầu là không sử dụng bất kỳ hàm đồ họa nào, để giải quyết vấn đề này chúng ta cần lấy dữ liệu liên quan từ chính file GIF. Không giống như file HTML hoặc XML hoặc các file định dạng văn bản khác, một file GIF và hầu hết các định dạng hình ảnh khác được lưu trữ ở định dạng nhị phân. Hầu hết các file nhị phân đều có header ở đầu file cung cấp thông tin meta về file cụ thể. Chúng ta có thể sử dụng thông tin này để tìm ra loại file và những thứ khác, chẳng hạn như chiều cao chiều rộng trong trường hợp là một file GIF. Một header GIF thông thường được hiển thị như bên dưới, sử dụng trình soạn thảo hex như [WinHex](1). 
 
@@ -31,7 +31,7 @@ Mô tả chi tiết header ở bên dưới
 
 
 
-Vì vậy để kiểm tra một file ảnh có đúng là một file GIF không, Chúng ta cần phải kiểm tra 3 byte đầu của phần header, cóa 'GIF', và 3 byte tiếp theo, là sôs phiên bản '87a' hoặc '89a'. Nó là những thứ mà hàm unpack() cần phải thực hiện. Trước khi chúng ta tìm giải pháp, nhìn qua xem hàm unpack() hoạt động thế nào.
+Vì vậy để kiểm tra một file ảnh có đúng là một file GIF không, Chúng ta cần phải kiểm tra 3 byte đầu của phần header, có 'GIF', và 3 byte tiếp theo, là số phiên bản '87a' hoặc '89a'. Nó là những thứ mà hàm unpack() cần phải thực hiện. Trước khi chúng ta tìm giải pháp, nhìn qua xem hàm unpack() hoạt động thế nào.
 
 #### Sử dụng hàm unpack()
 
@@ -74,16 +74,16 @@ Dưới đây là giải pháp cho vấn đề GIF của chúng ta bằng cách 
     function is_gif($image_file)
     {
      
-        /* Open the image file in binary mode */
+        /* Mở file hình ảnh ở chế độ nhị phân */
         if(!$fp = fopen ($image_file, 'rb')) return 0;
      
-        /* Read 20 bytes from the top of the file */
+       /* Đọc 20 bytes đầu của file */
         if(!$data = fread ($fp, 20)) return 0;
      
-        /* Create a format specifier */
+       /* Khai báo định dạng */
         $header_format = 'A6version';  # Get the first 6 bytes
     
-        /* Unpack the header data */
+        /* Unpack (gỉai mã) dữ liệu header */
         $header = unpack ($header_format, $data);
      
         $ver = $header['version'];
@@ -92,7 +92,7 @@ Dưới đây là giải pháp cho vấn đề GIF của chúng ta bằng cách 
      
     }
      
-    /* Run our example */
+    /* chạy ví dụ */
     echo is_gif("aboutus.gif");
 
 
@@ -162,36 +162,35 @@ Dưới đây chúng ta sẽ đi vào chi tiết cách mà format specifier ho�
     $header_format = 'A6Version/C2Width/C2Height/C1Flag/@11/C1Aspect';
   
     
-    A - Read a byte and interpret it as a string. 
-        Number of bytes to read is given next
-    6 - Read a total of 6 bytes, starting from position 0
-    Version - Name of key in the associative array where data 
-        retrieved by 'A6' is stored
-     
-    / - Start a new code format
-    C - Interpret the next data as an unsigned byte
-    2 - Read a total of 2 bytes
-    Width - Key in the associative array
-     
-    / - Start a new code format
-    C - Interpret the data as an unsigned byte
-    2 - Read a total of 2 bytes
-    Height- Key in the associative array
-     
-    / - Start a new code format
-    C - Interpret the data as an unsigned byte
-    1 - Read a total of 2 bytes
-    Flag - Key in the associative array
-     
-    / - Start a new code format
-    @ - Move to the byte offset specified by the following number.
-          Remember that the first position in the binary string is 0. 
-    11 - Move to position 11
-     
-    / - Start a new code format
-    C - Interpret the data as an unsigned byte
-    1 - Read a total of 1 bytes
-    Aspect - Key in the associative array
+    A - Đọc một byte và gỉai mã nó thành một chuỗi. 
+    Số các byte để đọc sẽ được cho trong phần tiếp theo
+6 - Đọc tổng cộng 6 bytes, bắt đầu từ vị trí 0
+Version - Tên của khóa trong mảng lưu trữ mà dữ liệu được lấy về bởi 'A6' 
+ 
+/ - Bắt đầu một định dạng code mới
+C - Gỉai mã dữ liệu tiếp theo thành byte không dấu
+2 - Đọc tổng cộng 2 bytes
+Width - Tên của khóa trong mảng
+ 
+/ - Bắt đầu một định dạng code mới
+C - Gỉai mã dữ liệu tiếp theo thành byte không dấu
+2 - Đọc tổng cộng 2 bytes
+Height- Tên của khóa trong mảng
+ 
+/ - Bắt đầu một định dạng code mới
+C - Gỉai mã dữ liệu tiếp theo thành byte không dấu
+1 - Đọc tổng cộng 2 bytes
+Flag - Tên của khóa trong mảng
+ 
+/ - Bắt đầu một định dạng code mới
+@ - Dịch chuyển số byte offset theo số được chỉ định sau.
+      Lưu ý rằng vị trí đầu tiên trong chuỗi nhị phân là 0. 
+11 - Dịch chuyển đến vị trí 11
+ 
+/ - Bắt đầu một định dạng code mới
+C - Gỉai mã dữ liệu tiếp theo thành byte không dấu
+1 - Đọc tổng cộng 1 byte
+Aspect - Tên của khóa trong mảng
 
  
 
