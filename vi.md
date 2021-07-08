@@ -1,7 +1,7 @@
 # [Link ImageChecker](https://packagist.org/packages/huyphi/image_checker)  
 # Giải nén dữ liệu nhị phân trong PHP
 
-Rất ít khi chúng ta phải làm việc với các file nhị nhân trong PHP. Tuy nhiên khi cần thì hàm 'pack' và 'unpack' thì PHP có thể giúp bạn rất nhiều. Để thiết lập giai đoạn chúng ta sẽ bắt đầu với một vấn đề lập trình, điều này sẽ giúp cho cuộc thảo luận được gắn với hoàn cảnh liên quan. Vấn đề ở đây là : Chúng ta muốn viết một hàm có đối số là một file ảnh và cho biết có phải là ảnh GIF hay không,bất kể file có đuôi như thế nào. Chúng ta không sử dụng bất kỳ hàm thư viện GD nào.
+Rất ít khi chúng ta phải làm việc với các file nhị nhân trong PHP. Tuy nhiên khi cần thì hàm 'pack' và 'unpack' trong PHP có thể giúp bạn rất nhiều. Để bắt đầu, chúng ta sẽ bắt đầu với một vấn đề lập trình, điều này sẽ giúp cho cuộc thảo luận được gắn với hoàn cảnh liên quan. Vấn đề ở đây là : Chúng ta muốn viết một hàm có đối số là một file ảnh và cho biết có phải là ảnh GIF hay không,bất kể file có đuôi như thế nào. Chúng ta không sử dụng bất kỳ hàm thư viện GD nào.
 
 #### A GIF file header
 
@@ -31,7 +31,7 @@ Mô tả chi tiết header ở bên dưới
 
 
 
-Vì vậy để kiểm tra một file ảnh có đúng là một file GIF không, Chúng ta cần phải kiểm tra 3 byte đầu của phần header, cóa 'GIF', và 3 byte tiếp theo, là sôs phiên bản '87a' hoặc '89a'. Nó là những thứ mà hàm unpack() cần phải thực hiện. Trước khi chúng ta tìm giải pháp, nhìn qua xem hàm unpack() hoạt động thế nào.
+Vì vậy để kiểm tra một file ảnh có đúng là một file GIF không, Chúng ta cần phải kiểm tra 3 byte đầu của phần header, có 'GIF', và 3 byte tiếp theo, là số phiên bản '87a' hoặc '89a'. Nó là những thứ mà hàm unpack() cần phải thực hiện. Trước khi chúng ta tìm giải pháp, nhìn qua xem hàm unpack() hoạt động thế nào.
 
 #### Sử dụng hàm unpack()
 
@@ -74,7 +74,7 @@ Dưới đây là giải pháp cho vấn đề GIF của chúng ta bằng cách 
     function is_gif($image_file)
     {
      
-        /* Open the image file in binary mode */
+        /* Mở file hình ảnh ở chế độ nhị phân */
         if(!$fp = fopen ($image_file, 'rb')) return 0;
      
         /* Read 20 bytes from the top of the file */
@@ -114,7 +114,7 @@ Một ví dụ khác được đưa ra dưới đây. Nó trả về một số 
      
         /* Create a format specifier */
         $header_format = 
-                'A6Version/' . # Get the first 6 bytes
+                'A6Version/' . # Lấy 6 bytes đầu tiên
                 'C2Width/' .   # Get the next 2 bytes
                 'C2Height/' .  # Get the next 2 bytes
                 'C1Flag/' .    # Get the next 1 byte
@@ -164,7 +164,7 @@ Dưới đây chúng ta sẽ đi vào chi tiết cách mà format specifier ho�
     
     A - Read a byte and interpret it as a string. 
         Number of bytes to read is given next
-    6 - Read a total of 6 bytes, starting from position 0
+    6 - Đọc tổng cộng 6 bytes, bắt đầu từ vị trí 0
     Version - Name of key in the associative array where data 
         retrieved by 'A6' is stored
      
